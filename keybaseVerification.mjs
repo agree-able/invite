@@ -19,7 +19,9 @@ export const verifyWhoamiSignature = async (signedWhoami, keybaseUsername) => {
     // Fetch public key from keybase
     const response = await fetch(`https://keybase.io/${keybaseUsername}/pgp_keys.asc`)
     const publicKeyArmored = await response.text()
+    console.log('got public key', publicKeyArmored)
     const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored })
+    // console.log('got public key', publicKey)
 
     // Verify signature
     const message = await openpgp.createMessage({ text: JSON.stringify(signedWhoami.payload) })
