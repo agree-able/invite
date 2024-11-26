@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "@agree-able/contract": "^1.4.1",
+    "@agree-able/rpc": "^2.0.3"
+  },
+  "name": "@agree-able/invite",
+  "version": "1.0.0",
+  "description": "simple ways to get an invite to a room",
+  "main": "index.mjs",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agree-able/invite.git"
+  },
+  "author": "Ryan Ramage",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/agree-able/invite/issues"
+  },
+  "homepage": "https://github.com/agree-able/invite#readme"
+}
