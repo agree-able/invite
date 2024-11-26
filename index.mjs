@@ -1,6 +1,7 @@
 import { z, Caller } from '@agree-able/rpc'
 import agreement, { NewRoom, RoomExpectiations } from './agreement.mjs'
 import { breakoutRoomKey, didKey, keybaseKey } from './dnsTxt.mjs'
+import { signWhoami, verifyWhoamiSignature } from './keybaseVerification.mjs'
 
 export const load = async (config, confirmEnterRoom) => {
   if (config.invite) return { invite: config.invite }
@@ -24,7 +25,12 @@ export const withAgreeableKey = async (agreeableKey, confirmEnterRoom) => {
     const {agreement, whoami} = await confirmEnterRoom(expectations)
     if (!agreement) return
   }
-  const invite = await newRoom(agreement, whoami)
+  // Sign the whoami payload if private key is provided
+  const signedWhoami = config.privateKey ? 
+    await signWhoami(whoami, config.privateKey) : 
+    whoami
+  
+  const invite = await newRoom(agreement, signedWhoami)
   return invite
 }
 
