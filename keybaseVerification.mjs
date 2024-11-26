@@ -1,5 +1,12 @@
 import * as openpgp from 'openpgp'
 import fetch from 'node-fetch'
+import crypto from 'crypto'
+
+export const generateChallengeText = async () => {
+  const timestamp = new Date().toISOString()
+  const randomBytes = crypto.randomBytes(16).toString('hex')
+  return `challenge-${timestamp}-${randomBytes}`
+}
 
 export const getKeybaseProofChain = async (keybaseUsername) => {
   try {
