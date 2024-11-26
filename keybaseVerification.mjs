@@ -36,8 +36,8 @@ export const verifyWhoamiSignature = async (signedWhoami, keybaseUsername) => {
       verificationKeys: publicKey
     })
 
-    const { verified } = verificationResult
-    console.log(verificationResult)
+    const { verified } = await verificationResult.signatures[0]
+    console.log('Verification result:', verified)
     return verified
   } catch (error) {
     console.error('Verification failed:', error)
