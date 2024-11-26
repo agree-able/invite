@@ -4,7 +4,7 @@ import fetch from 'node-fetch'
 export const signWhoami = async (whoami, privateKeyArmored) => {
   const privateKey = await openpgp.readPrivateKey({ armoredKey: privateKeyArmored })
   const message = await openpgp.createMessage({ text: JSON.stringify(whoami) })
-  const detachedSignature = await openpgp.sign({
+  const signature = await openpgp.sign({
     message,
     signingKeys: privateKey,
     detached: true
