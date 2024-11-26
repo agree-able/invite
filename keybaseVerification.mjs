@@ -4,9 +4,10 @@ import fetch from 'node-fetch'
 export const signWhoami = async (whoami, privateKeyArmored) => {
   const privateKey = await openpgp.readPrivateKey({ armoredKey: privateKeyArmored })
   const message = await openpgp.createMessage({ text: JSON.stringify(whoami) })
-  const signature = await openpgp.sign({
+  const detachedSignature = await openpgp.sign({
     message,
-    signingKeys: privateKey
+    signingKeys: privateKey,
+    detached: true
   })
   return {
     payload: whoami,
@@ -25,7 +26,9 @@ export const verifyWhoamiSignature = async (signedWhoami, keybaseUsername) => {
 
     // Verify signature
     const message = await openpgp.createMessage({ text: JSON.stringify(signedWhoami.payload) })
-    const signature = await openpgp.readSignature({ armoredSignature: signedWhoami.signature })
+    const signature = await openpgp.readSignature({
+      armoredSignature: signedWhoami.signature
+    })
     
     const verificationResult = await openpgp.verify({
       message,
