@@ -36,19 +36,19 @@ const result = await load(config, confirmEnterRoom)
 
 ## The confirmEnterRoom Function
 
-The `confirmEnterRoom` function is required and must handle room entry expectations. It receives room expectations and additional info, and should return an acceptance object.
+The `confirmEnterRoom` function is required and must handle room entry expectations. It receives room expectations and host details, and should return an acceptance object.
 
 ```javascript
-const confirmEnterRoom = async (expectations, extraInfo) => {
+const confirmEnterRoom = async (expectations, hostDetails) => {
   // expectations contains room requirements
-  // extraInfo may contain verification details if whoami is enabled
+  // hostDetails may contain verification details if whoami is enabled
   
   console.log('room rules', expectations.rules)
   console.log('room reason', expectations.reason)
 
   // Example of checking whoami verification
-  if (extraInfo?.whoami?.keybase) {
-    const { verified, username } = extraInfo.whoami.keybase
+  if (hostDetails?.whoami?.keybase) {
+    const { verified, username } = hostDetails.whoami.keybase
     if (!verified) {
       throw new Error(`Keybase verification failed for ${username}`)
     }
