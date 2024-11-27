@@ -1,17 +1,17 @@
-# Agreeable Room Configuration
+# Agreeable Room Invitations 
 
 A utility for loading and configuring room settings with support for invites, domain-based configuration, and identity verification through Keybase.
 
 ## Installation
 
 ```bash
-npm install @agree-able/room-config
+npm install @agree-able/invite
 ```
 
 ## Quick Start
 
 ```javascript
-import { load } from '@agree-able/room-config'
+import { load } from '@agree-able/invite'
 
 // Simple usage with direct invite
 const config = { invite: 'your-invite-code' }
