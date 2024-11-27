@@ -5,14 +5,14 @@ import { signWhoami, verifyWhoamiSignature, generateChallengeText, getKeybasePro
 import fs from 'fs'
 
 const ConfigSchema = z.object({
-  invite: z.string().optional(),
-  domain: z.string().optional(),
-  loadDid: z.boolean().optional(),
-  whoamiHost: z.boolean().optional(),
-  keybaseUsername: z.string().optional(),
-  privateKeyArmoredFile: z.string().optional(),
-  privateKeyArmored: z.string().optional(),
-  _: z.array(z.string()).optional()
+  invite: z.string().describe('Directly set invite - a z32 string').optional(),
+  domain: z.string().describe('Domain to lookup breakout room key from').optional(),
+  loadDid: z.boolean().describe('Whether to load DID from domain').optional(),
+  whoamiHost: z.boolean().describe('Should the Host perform whoami verification').optional(),
+  keybaseUsername: z.string().describe('Keybase username for verification').optional(),
+  privateKeyArmoredFile: z.string().describe('File location of a PGP private key in armored format').optional(),
+  privateKeyArmored: z.string().describe('PGP private key in armored format').optional(),
+  _: z.array(z.string()).describe('Array of command line arguments').optional()
 })
 
 const ConfirmEnterRoomSchmea = z.function().args(
