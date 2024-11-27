@@ -78,6 +78,7 @@ export const withExternal = async (config, confirmEnterRoom, { roomExpectations,
   if (config.hostProveWhoami) expectationOpts.challengeText = await generateChallengeText()
   /** @type{z.infer<Expectations>} */
   const expectations = await roomExpectations(expectationOpts)
+  if (config.hostProveWhoami && !expectations.whoami) throw new Error('host was to prove whoami but expectations.whoami was not returned')
   const hostDetails = {}
   if (config.hostProveWhoami && expectations.whoami && expectations.whoami.keybase) {
     hostDetails.whoami = { keybase: { username: expectations.whoami.keybase.username } }
