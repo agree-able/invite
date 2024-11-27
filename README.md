@@ -34,6 +34,37 @@ const config = {
 const result = await load(config, confirmEnterRoom)
 ```
 
+## The confirmEnterRoom Function
+
+The `confirmEnterRoom` function is required and must handle room entry expectations. It receives room expectations and additional info, and should return an acceptance object.
+
+```javascript
+const confirmEnterRoom = async (expectations, extraInfo) => {
+  // expectations contains room requirements
+  // extraInfo may contain verification details if whoami is enabled
+  
+  // Example of checking room expectations
+  if (expectations.maxParticipants > 10) {
+    throw new Error('Room too large')
+  }
+
+  // Example of checking whoami verification
+  if (extraInfo?.whoami?.keybase) {
+    const { verified, username } = extraInfo.whoami.keybase
+    if (!verified) {
+      throw new Error(`Keybase verification failed for ${username}`)
+    }
+  }
+
+  // Return acceptance object
+  return {
+    acceptMaxParticipants: expectations.maxParticipants,
+    acceptRecording: expectations.recordingAllowed,
+    // ... other acceptance parameters
+  }
+}
+```
+
 ## Key Features
 
 - Direct invite code support
