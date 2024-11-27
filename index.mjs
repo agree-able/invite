@@ -15,7 +15,7 @@ const ConfigSchema = z.object({
   _: z.array(z.string()).describe('Array of command line arguments').optional()
 })
 
-const ConfirmEnterRoomSchmea = z.function().args(
+const ConfirmEnterRoomSchema = z.function().args(
   Expectations,
   z.object({
     whoami: z.object({
