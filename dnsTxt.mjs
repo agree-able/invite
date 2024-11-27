@@ -9,7 +9,6 @@ export const load = async (domain, proto, label) => {
 export const valueFromDomain = async (domain, label) => {
   const records = await resolveTxt(domain)
   let agreeableKey = null
-  console.log(records)
   records.forEach((record) => {
     const asString = record.join('')
     const parts = asString.split('=')
