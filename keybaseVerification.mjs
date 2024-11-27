@@ -10,8 +10,11 @@ export const generateChallengeText = async () => {
 
 export const getKeybaseProofChain = async (keybaseUsername) => {
   try {
-    const response = await fetch(`https://keybase.io/_/api/1.0/user/lookup.json?username=${keybaseUsername}&fields=proofs_summary`)
+    const url = `https://keybase.io/_/api/1.0/user/lookup.json?username=${keybaseUsername}&fields=proofs_summary`
+    console.log(url)
+    const response = await fetch(url)
     const data = await response.json()
+    console.log('daaata', JSON.stringify(data, null, 4))
 
     if (!data.them || !data.them.proofs_summary) {
       throw new Error('User not found or no proofs available')

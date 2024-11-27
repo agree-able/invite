@@ -15,23 +15,26 @@ export const ConfigSchema = z.object({
   _: z.array(z.string()).describe('Array of command line arguments').optional()
 })
 
+export const HostDetails = z.object({
+  did: z.string().optional().describe('DID of the host'),
+  whoami: z.object({
+    keybase: z.object({
+      username: z.string().describe('username on keybase'),
+      verified: z.boolean().describe('if the verification passed'),
+      chain: z.array(z.object({
+        username: z.string().describe('username associated with the proof'),
+        serviceUrl: z.string().describe('URL of the service where the proof is hosted'),
+        proofUrl: z.string().describe('Direct URL to the proof'),
+        presentedUrl: z.string().optional().describe('User-friendly URL for displaying the proof').optional(),
+        state: z.number().describe('Whether the proof is currently valid')
+      })).describe('keybase information about the host')
+    }).optional().describe('if hostProveWhoami is true, then this should be provided')
+  }).optional().describe('host whoami')
+})
+
 export const ConfirmEnterRoomSchema = z.function().args(
   Expectations,
-  z.object({
-    whoami: z.object({
-      keybase: z.object({
-        username: z.string().describe('username on keybase'),
-        verified: z.boolean().describe('if the verification passed'),
-        chain: z.array(z.object({
-          username: z.string().describe('username associated with the proof'),
-          serviceUrl: z.string().describe('URL of the service where the proof is hosted'),
-          proofUrl: z.string().describe('Direct URL to the proof'),
-          presentedUrl: z.string().describe('User-friendly URL for displaying the proof').optional(),
-          state: z.number().describe('Whether the proof is currently valid')
-        })).describe('keybase information about the host')
-      }).optional().describe('if hostProveWhoami is true, then this should be provided')
-    }).optional().describe('host details that might be useful')
-  })
+  HostDetails
 ).returns(z.promise(AcceptExpectations))
 
 /**
@@ -46,7 +49,7 @@ export const ConfirmEnterRoomSchema = z.function().args(
  * @param {string} [config.privateKeyArmored] - PGP private key in armored format
  * @param {string[]} [config._] - Array of command line arguments
  * @param {Function} confirmEnterRoom - Callback function to confirm room entry
- * @returns {Promise<{invite?: string, did?: string}>} Room configuration
+ * @returns {Promise<{invite?: string }>} Room configuration
  */
 export const load = async (config, confirmEnterRoom) => {
   // validate config using zod
@@ -58,36 +61,42 @@ export const load = async (config, confirmEnterRoom) => {
     const agreeableKey = await breakoutRoomKey(config.domain)
     const did = config.loadDid ? await didKey(config.domain) : null
     if (agreeableKey) {
-      const { ok, invite, reason } = await withAgreeableKey(config, confirmEnterRoom, agreeableKey)
+      const { ok, invite, reason } = await withAgreeableKey(config, confirmEnterRoom, agreeableKey, { did })
       if (!ok) throw new Error(reason)
-      return { invite, did }
+      return { invite }
     }
   }
   // lastly if one string on the cli, lets assume that is the invite
   if (config._ && config._.length === 1) return { invite: config._[0] }
 }
 
-export const withAgreeableKey = async (config, confirmEnterRoom, agreeableKey) => {
+export const withAgreeableKey = async (config, confirmEnterRoom, agreeableKey, hostExtraInfo) => {
   const proxy = await roomProxyFromKey(agreeableKey)
   const keybase = { verifySignedText, signText, getKeybaseProofChain }
-  return await withExternal(config, confirmEnterRoom, proxy, keybase)
+  return await withExternal(config, confirmEnterRoom, proxy, keybase, hostExtraInfo)
 }
 
-export const withExternal = async (config, confirmEnterRoom, { roomExpectations, newRoom }, keybase) => {
+export const withExternal = async (config, confirmEnterRoom, { roomExpectations, newRoom }, keybase, hostExtraInfo) => {
   const expectationOpts = {}
   if (config.hostProveWhoami) expectationOpts.challengeText = await generateChallengeText()
   /** @type{z.infer<Expectations>} */
   const expectations = await roomExpectations(expectationOpts)
-  if (config.hostProveWhoami && !expectations.whoami) throw new Error('host was to prove whoami but expectations.whoami was not returned')
-  const hostDetails = {}
-  if (config.hostProveWhoami && expectations.whoami && expectations.whoami.keybase) {
-    if (expectationOpts.challengeText !== expectations.whoami.keybase.challengeResponse.text) throw new Error('challengeText was modified')
-    hostDetails.whoami = { keybase: { username: expectations.whoami.keybase.username } }
-    hostDetails.whoami.keybase.verified = await keybase.verifySignedText(expectations.whoami.keybase.challengeResponse, expectations.whoami.keybase.username)
-    hostDetails.whoami.keybase.chain = await keybase.getKeybaseProofChain(expectations.whoami.keybase.username)
+  const hostDetails = { ...hostExtraInfo }
+  if (config.hostProveWhoami) {
+    if (!expectations.whoami) throw new Error('host was to prove whoami but expectations.whoami was not returned')
+    if (expectations.whoami.keybase) {
+      if (!expectations.whoami.keybase.username) throw new Error('host username was not returned')
+      if (expectationOpts.challengeText !== expectations.whoami.keybase.challengeResponse.text) throw new Error('challengeText was modified')
+      hostDetails.whoami = { keybase: { username: expectations.whoami.keybase.username } }
+      hostDetails.whoami.keybase.verified = await keybase.verifySignedText(expectations.whoami.keybase.challengeResponse, expectations.whoami.keybase.username)
+      hostDetails.whoami.keybase.chain = await keybase.getKeybaseProofChain(expectations.whoami.keybase.username)
+    }
+    if (!hostDetails.whoami) throw new Error('host did not provide any known whoami response')
   }
-  if (!confirmEnterRoom) throw new Error('confirmEnterRoom function required')
-  const accept = await confirmEnterRoom(expectations, hostDetails)
+  const wrapped = ConfirmEnterRoomSchema.implement(confirmEnterRoom)
+  const accept = await wrapped(expectations, hostDetails)
+  AcceptExpectations.parse(accept)
+
   const newRoomOpts = { accept }
   if (expectations.whoamiRequired) {
     newRoomOpts.whoami = {}

@@ -1,0 +1,68 @@
+{
+    "status": {
+        "code": 0,
+        "name": "OK"
+    },
+    "them": {
+        "id": "7621ec4bd4e6a4311b5653e0db9e5d19",
+        "basics": {
+            "username": "ra_mage",
+            "ctime": 1732652680,
+            "mtime": 1732652680,
+            "id_version": 11,
+            "track_version": 0,
+            "last_id_change": 1732656928,
+            "username_cased": "ra_mage",
+            "status": 0,
+            "salt": "1411bd910d4f998f71eaab62632fdf35",
+            "eldest_seqno": 1
+        },
+        "proofs_summary": {
+            "by_presentation_group": {
+                "web:ramage.in": [
+                    {
+                        "proof_type": "dns",
+                        "nametag": "ramage.in",
+                        "state": 1,
+                        "service_url": "http://ramage.in",
+                        "proof_url": "https://keybase.io/ra_mage/sigchain#a8f1b8e499aed3e0807898a3225e797a4464b38ad8a50ec3b686a480ff9cabb00f",
+                        "sig_id": "a8f1b8e499aed3e0807898a3225e797a4464b38ad8a50ec3b686a480ff9cabb00f",
+                        "proof_id": "82c775f3b7252c834e190410",
+                        "human_url": "dns://ramage.in",
+                        "presentation_group": "web:ramage.in",
+                        "presentation_tag": "dns"
+                    }
+                ]
+            },
+            "by_sig_id": {
+                "a8f1b8e499aed3e0807898a3225e797a4464b38ad8a50ec3b686a480ff9cabb00f": {
+                    "proof_type": "dns",
+                    "nametag": "ramage.in",
+                    "state": 1,
+                    "service_url": "http://ramage.in",
+                    "proof_url": "https://keybase.io/ra_mage/sigchain#a8f1b8e499aed3e0807898a3225e797a4464b38ad8a50ec3b686a480ff9cabb00f",
+                    "sig_id": "a8f1b8e499aed3e0807898a3225e797a4464b38ad8a50ec3b686a480ff9cabb00f",
+                    "proof_id": "82c775f3b7252c834e190410",
+                    "human_url": "dns://ramage.in",
+                    "presentation_group": "web:ramage.in",
+                    "presentation_tag": "dns"
+                }
+            },
+            "all": [
+                {
+                    "proof_type": "dns",
+                    "nametag": "ramage.in",
+                    "state": 1,
+                    "service_url": "http://ramage.in",
+                    "proof_url": "https://keybase.io/ra_mage/sigchain#a8f1b8e499aed3e0807898a3225e797a4464b38ad8a50ec3b686a480ff9cabb00f",
+                    "sig_id": "a8f1b8e499aed3e0807898a3225e797a4464b38ad8a50ec3b686a480ff9cabb00f",
+                    "proof_id": "82c775f3b7252c834e190410",
+                    "human_url": "dns://ramage.in",
+                    "presentation_group": "web:ramage.in",
+                    "presentation_tag": "dns"
+                }
+            ],
+            "has_web": true
+        }
+    }
+}

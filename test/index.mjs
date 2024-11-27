@@ -53,11 +53,19 @@ t.test('participant requires whoami but host does not', async t => {
   const getKeybaseProofChain = async (username) => {
     t.equal(username, 'host_username', 'host username matches')
     console.log('participant keybase proof chain', username)
-    return 'chain'
+    const dns = {
+      username: 'ramage.in',
+      serviceUrl: 'http://ramage.in',
+      proofUrl: 'https://keybase.io/ra_mage/sigchain#a8f1b8e499aed3e0807898a3225e797a4464b38ad8a50ec3b686a480ff9cabb00f',
+      presentedUrl: undefined,
+      state: 1
+    }
+    return [dns]
   }
   const confirmEnterRoom = async (_expectations, hostDetails) => {
     console.log('participant confirm enter room, expectations', _expectations)
     console.log('participant confirm enter room, hostDetails', hostDetails)
+    t.equal(hostDetails.did, 'did:12211221:fds', 'host did is provided and matches')
     t.ok(hostDetails.whoami.keybase.verified, 'keybase returned verified, available for confirm enter room')
     return { rules: true, reason: true }
   }
@@ -70,7 +78,8 @@ t.test('participant requires whoami but host does not', async t => {
   }
   // end host side
 
-  const result = await withExternal(config, confirmEnterRoom, { roomExpectations, newRoom }, { verifySignedText, getKeybaseProofChain })
+  const hostExtraInfo = { did: 'did:12211221:fds' }
+  const result = await withExternal(config, confirmEnterRoom, { roomExpectations, newRoom }, { verifySignedText, getKeybaseProofChain }, hostExtraInfo)
   console.log(result)
   t.end()
 })
