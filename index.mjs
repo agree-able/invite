@@ -112,8 +112,8 @@ export const roomProxyFromKey = async (agreeableKey) => {
   const caller = new Caller(agreeableKey)
   // @ts-expect-error
   /** @type{{
-   *   newRoom: z.infer<NewRoom>
-   *   RoomExpectiations: z.infer<RoomExpectiations>
+   *   newRoom: z.infer<import('./agreement.mjs').NewRoom>
+   *   RoomExpectiations: z.infer<import('./agreement.mjs').RoomExpectiations>
    * }} */
   const { newRoom, roomExpectations } = caller.proxy(agreement)
   return { newRoom, roomExpectations }
