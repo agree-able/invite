@@ -20,14 +20,14 @@ const ConfirmEnterRoomSchema = z.function().args(
   z.object({
     whoami: z.object({
       keybase: z.object({
-        username: z.string(),
-        verified: z.boolean(),
+        username: z.string().describe('username on keybase'),
+        verified: z.boolean().describe('if the verification passed'),
         chain: z.array(z.object({
-          username: z.string().describe('Keybase username associated with the proof'),
+          username: z.string().describe('username associated with the proof'),
           serviceUrl: z.string().describe('URL of the service where the proof is hosted'),
           proofUrl: z.string().describe('Direct URL to the proof'),
           presentedUrl: z.string().describe('User-friendly URL for displaying the proof').optional(),
-          state: z.boolean().describe('Whether the proof is currently valid')
+          state: z.number().describe('Whether the proof is currently valid')
         }))
       }).optional()
     }).optional()
