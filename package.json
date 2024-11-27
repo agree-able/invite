@@ -1,13 +1,14 @@
 {
   "dependencies": {
     "@agree-able/contract": "^1.4.1",
-    "@agree-able/rpc": "^2.0.3"
+    "@agree-able/rpc": "^2.0.3",
+    "node-fetch": "^3.3.2",
+    "openpgp": "^6.0.1"
   },
   "name": "@agree-able/invite",
   "version": "1.0.0",
   "description": "simple ways to get an invite to a room",
   "main": "index.mjs",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
