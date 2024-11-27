@@ -12,7 +12,7 @@ export const getKeybaseProofChain = async (keybaseUsername) => {
   try {
     const response = await fetch(`https://keybase.io/_/api/1.0/user/lookup.json?username=${keybaseUsername}&fields=proofs_summary`)
     const data = await response.json()
-    
+
     if (!data.them || !data.them.proofs_summary) {
       throw new Error('User not found or no proofs available')
     }
@@ -64,7 +64,7 @@ export const verifyWhoamiSignature = async (signedWhoami, keybaseUsername) => {
     const signature = await openpgp.readSignature({
       armoredSignature: signedWhoami.signature
     })
-    
+
     const verificationResult = await openpgp.verify({
       message,
       signature,

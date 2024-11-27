@@ -22,7 +22,7 @@ export const Expectations = z.object({
 })
 
 export const RoomExpectiations = z.function().args({
-  challengeText: z.string().optional().describe('the challenge text if you want the host to sign'),
+  challengeText: z.string().optional().describe('the challenge text if you want the host to sign')
 }).returns(z.promise(Expectations))
 
 export const AcceptExpectations = z.object({
@@ -51,4 +51,3 @@ const api = {
   }
 }
 export default api
-
