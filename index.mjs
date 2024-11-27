@@ -22,7 +22,18 @@ const ConfirmEnterRoomSchema = z.function().args(
       keybase: z.object({
         username: z.string(),
         verified: z.boolean(),
-        chain: z.object({})
+        chain: z.array(z.object({
+          proof_type: z.string(),
+          proof_url: z.string(),
+          service_url: z.string(),
+          presentation_group: z.string(),
+          presentation_tag: z.string(),
+          state: z.boolean(),
+          human_url: z.string().optional(),
+          service_url: z.string().optional(),
+          presentation_group: z.string().optional(),
+          presentation_tag: z.string().optional()
+        }))
       }).optional()
     }).optional()
   })
@@ -46,7 +57,7 @@ export const load = async (config, confirmEnterRoom) => {
   // validate config using zod
   ConfigSchema.parse(config)
   // validate confirmEnterRoom using zod
-  ConfirmEnterRoomSchmea.parse(confirmEnterRoom)
+  ConfirmEnterRoomSchema.parse(confirmEnterRoom)
   if (config.invite) return { invite: config.invite }
   if (config.domain) {
     const agreeableKey = await breakoutRoomKey(config.domain)
