@@ -43,10 +43,8 @@ const confirmEnterRoom = async (expectations, extraInfo) => {
   // expectations contains room requirements
   // extraInfo may contain verification details if whoami is enabled
   
-  // Example of checking room expectations
-  if (expectations.maxParticipants > 10) {
-    throw new Error('Room too large')
-  }
+  console.log('room rules', expectations.rules)
+  console.log('room reason', expectations.reason)
 
   // Example of checking whoami verification
   if (extraInfo?.whoami?.keybase) {
@@ -58,9 +56,8 @@ const confirmEnterRoom = async (expectations, extraInfo) => {
 
   // Return acceptance object
   return {
-    acceptMaxParticipants: expectations.maxParticipants,
-    acceptRecording: expectations.recordingAllowed,
-    // ... other acceptance parameters
+    reason: true, // 'agree to the reason for the room'
+    rules: true // 'agree to the rules for the room'
   }
 }
 ```
