@@ -10,7 +10,7 @@
   "description": "simple ways to get an invite to a room",
   "main": "index.mjs",
   "scripts": {
-    "test": "standard",
+    "test": "standard && tap run",
     "fix": "standard --fix"
   },
   "repository": {
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/agree-able/invite#readme",
   "devDependencies": {
-    "standard": "^17.1.2"
+    "standard": "^17.1.2",
+    "tap": "^21.0.1"
   }
 }

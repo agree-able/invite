@@ -21,9 +21,9 @@ export const Expectations = z.object({
   challengeText: z.string().optional().describe('if whoamiRequired, a challenge text for the participant to sign')
 })
 
-export const RoomExpectiations = z.function().args({
+export const RoomExpectiations = z.function().args(z.object({
   challengeText: z.string().optional().describe('the challenge text if you want the host to sign')
-}).returns(z.promise(Expectations))
+})).returns(z.promise(Expectations))
 
 export const AcceptExpectations = z.object({
   reason: z.boolean().describe('participant agrees to the reason for the room'),
@@ -36,10 +36,10 @@ export const NewRoomResponse = z.object({
   reason: z.string().optional().describe('if ok is false, the reason why')
 })
 
-export const NewRoom = z.function().args({
+export const NewRoom = z.function().args(z.object({
   accept: AcceptExpectations,
   whoami: Whoami.optional()
-}).returns(z.promise(NewRoomResponse))
+})).returns(z.promise(NewRoomResponse))
 
 const api = {
   role: 'roommanager',
