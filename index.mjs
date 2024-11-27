@@ -58,7 +58,7 @@ export const load = async (config, confirmEnterRoom) => {
     const agreeableKey = await breakoutRoomKey(config.domain)
     const did = config.loadDid ? await didKey(config.domain) : null
     if (agreeableKey) {
-      const { ok, invite, reason } = await withAgreeableKey(config, agreeableKey, confirmEnterRoom)
+      const { ok, invite, reason } = await withAgreeableKey(config, confirmEnterRoom, agreeableKey)
       if (!ok) throw new Error(reason)
       return { invite, did }
     }
@@ -67,8 +67,13 @@ export const load = async (config, confirmEnterRoom) => {
   if (config._ && config._.length === 1) return { invite: config._[0] }
 }
 
-export const withAgreeableKey = async (config, agreeableKey, confirmEnterRoom) => {
-  const { roomExpectations, newRoom } = await roomProxyFromKey(agreeableKey)
+export const withAgreeableKey = async (config, confirmEnterRoom, agreeableKey) => {
+  const proxy = await roomProxyFromKey(agreeableKey)
+  const keybase = { verifyWhoamiSignature, getKeybaseProofChain }
+  return await withExternal(config, confirmEnterRoom, proxy, keybase)
+}
+
+export const withExternal = async (config, confirmEnterRoom, { roomExpectations, newRoom }, keybase) => {
   const expectationOpts = {}
   if (config.hostProveWhoami) expectationOpts.challengeText = await generateChallengeText()
   /** @type{z.infer<Expectations>} */
@@ -76,8 +81,8 @@ export const withAgreeableKey = async (config, agreeableKey, confirmEnterRoom) =
   const hostDetails = {}
   if (config.hostProveWhoami && expectations.whoami && expectations.whoami.keybase) {
     hostDetails.whoami = { keybase: { username: expectations.whoami.keybase.username } }
-    hostDetails.whoami.keybase.verfied = await verifyWhoamiSignature(expectations.whoami.keybase.challengeResponse, expectations.whoami.keybase.username)
-    hostDetails.whoami.keybase.chain = await getKeybaseProofChain(expectations.whoami.keybase.username)
+    hostDetails.whoami.keybase.verfied = await keybase.verifyWhoamiSignature(expectations.whoami.keybase.challengeResponse, expectations.whoami.keybase.username)
+    hostDetails.whoami.keybase.chain = await keybase.getKeybaseProofChain(expectations.whoami.keybase.username)
   }
   if (!confirmEnterRoom) throw new Error('confirmEnterRoom function required')
   const accept = await confirmEnterRoom(expectations, hostDetails)
