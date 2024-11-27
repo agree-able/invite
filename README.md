@@ -27,7 +27,6 @@ const result = await load(config, confirmEnterRoom)
 // With Keybase verification
 const config = {
   domain: 'example.com',
-  whoamiHost: true,
   keybaseUsername: 'username',
   privateKeyArmored: 'your-pgp-key'
 }
@@ -54,7 +53,7 @@ const confirmEnterRoom = async (expectations, hostDetails) => {
     }
   }
 
-  // Return acceptance object
+  // you must return the acceptance object back to the server
   return {
     reason: true, // 'agree to the reason for the room'
     rules: true // 'agree to the rules for the room'
