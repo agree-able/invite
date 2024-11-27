@@ -10,7 +10,8 @@
   "description": "simple ways to get an invite to a room",
   "main": "index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "standard",
+    "fix": "standard --fix"
   },
   "repository": {
     "type": "git",
@@ -21,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/agree-able/invite/issues"
   },
-  "homepage": "https://github.com/agree-able/invite#readme"
+  "homepage": "https://github.com/agree-able/invite#readme",
+  "devDependencies": {
+    "standard": "^17.1.2"
+  }
 }
