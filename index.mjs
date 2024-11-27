@@ -3,6 +3,19 @@ import agreement, { NewRoom, RoomExpectiations, Expectations, NewRoomResponse } 
 import { breakoutRoomKey, didKey } from './dnsTxt.mjs'
 import { signWhoami, verifyWhoamiSignature, generateChallengeText, getKeybaseProofChain } from './keybaseVerification.mjs'
 
+/**
+ * Loads room configuration based on provided config options
+ * @param {Object} config - Configuration object
+ * @param {string} [config.invite] - Direct invite string
+ * @param {string} [config.domain] - Domain to lookup breakout room key from
+ * @param {boolean} [config.loadDid] - Whether to load DID from domain
+ * @param {string} [config.whoamiHost] - Host for whoami verification
+ * @param {string} [config.keybaseUsername] - Keybase username for verification
+ * @param {string} [config.privateKeyArmored] - PGP private key in armored format
+ * @param {string[]} [config._] - Array of command line arguments
+ * @param {Function} confirmEnterRoom - Callback function to confirm room entry
+ * @returns {Promise<{invite?: string, did?: string}>} Room configuration
+ */
 export const load = async (config, confirmEnterRoom) => {
   if (config.invite) return { invite: config.invite }
   if (config.domain) {
