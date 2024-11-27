@@ -23,11 +23,11 @@ const ConfirmEnterRoomSchema = z.function().args(
         username: z.string(),
         verified: z.boolean(),
         chain: z.array(z.object({
-          username: z.string(),
-          serviceUrl: z.string(),
-          proofUrl: z.string(),
-          presentedUrl: z.string().optional(),
-          state: z.boolean()
+          username: z.string().describe('Keybase username associated with the proof'),
+          serviceUrl: z.string().describe('URL of the service where the proof is hosted'),
+          proofUrl: z.string().describe('Direct URL to the proof'),
+          presentedUrl: z.string().describe('User-friendly URL for displaying the proof').optional(),
+          state: z.boolean().describe('Whether the proof is currently valid')
         }))
       }).optional()
     }).optional()
