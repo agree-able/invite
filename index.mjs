@@ -1,5 +1,5 @@
 import { z, Caller } from '@agree-able/rpc'
-import agreement, { NewRoom, RoomExpectiations, Expectations, NewRoomResponse, AcceptExpectations } from './agreement.mjs'
+import agreement, { Expectations, AcceptExpectations } from './agreement.mjs'
 import { breakoutRoomKey, didKey } from './dnsTxt.mjs'
 import { signWhoami, verifyWhoamiSignature, generateChallengeText, getKeybaseProofChain } from './keybaseVerification.mjs'
 import fs from 'fs'
@@ -23,16 +23,11 @@ const ConfirmEnterRoomSchema = z.function().args(
         username: z.string(),
         verified: z.boolean(),
         chain: z.array(z.object({
-          proof_type: z.string(),
-          proof_url: z.string(),
-          service_url: z.string(),
-          presentation_group: z.string(),
-          presentation_tag: z.string(),
-          state: z.boolean(),
-          human_url: z.string().optional(),
-          service_url: z.string().optional(),
-          presentation_group: z.string().optional(),
-          presentation_tag: z.string().optional()
+          username: z.string(),
+          serviceUrl: z.string(),
+          proofUrl: z.string(),
+          presentedUrl: z.string().optional(),
+          state: z.boolean()
         }))
       }).optional()
     }).optional()
