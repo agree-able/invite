@@ -5,7 +5,14 @@ import { signWhoami, verifyWhoamiSignature, generateChallengeText, getKeybasePro
 import fs from 'fs'
 
 const ConfigSchema = z.object({
-  invite: z.string.optional(),
+  invite: z.string().optional(),
+  domain: z.string().optional(),
+  loadDid: z.boolean().optional(),
+  whoamiHost: z.boolean().optional(),
+  keybaseUsername: z.string().optional(),
+  privateKeyArmoredFile: z.string().optional(),
+  privateKeyArmored: z.string().optional(),
+  _: z.array(z.string()).optional()
 })
 
 const ConfirmEnterRoomSchmea = z.function().args(
