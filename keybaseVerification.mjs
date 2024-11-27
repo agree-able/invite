@@ -33,7 +33,6 @@ export const getKeybaseProofChain = async (keybaseUsername) => {
       return acc
     }, {})
   } catch (error) {
-    console.error('Error fetching Keybase proof chain:', error)
     return null
   }
 }

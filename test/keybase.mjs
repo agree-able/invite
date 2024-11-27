@@ -51,3 +51,23 @@ t.test('keybase proof chain', async t => {
   t.ok(results)
   t.end()
 })
+
+t.test('proof chain not found', async t => {
+  nock('https://keybase.io')
+    .get('/_/api/1.0/user/lookup.json')
+    .query(true) // This will match the exact query string
+    .reply(404)
+  const results = await getKeybaseProofChain('agreeable-test')
+  t.notOk(results)
+  t.end()
+})
+
+t.test('weird response', async t => {
+  nock('https://keybase.io')
+    .get('/_/api/1.0/user/lookup.json')
+    .query(true) // This will match the exact query string
+    .reply(200, { weird: 'response' })
+  const results = await getKeybaseProofChain('agreeable-test')
+  t.notOk(results)
+  t.end()
+})
