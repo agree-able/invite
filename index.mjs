@@ -1,16 +1,16 @@
 import { z, Caller } from '@agree-able/rpc'
-import agreement, { NewRoom, RoomExpectiations } from './agreement.mjs'
-import { breakoutRoomKey, didKey, keybaseKey } from './dnsTxt.mjs'
-import { signWhoami, verifyWhoamiSignature } from './keybaseVerification.mjs'
+import agreement, { NewRoom, RoomExpectiations, Expectations, NewRoomResponse } from './agreement.mjs'
+import { breakoutRoomKey, didKey } from './dnsTxt.mjs'
+import { signWhoami, verifyWhoamiSignature, generateChallengeText, getKeybaseProofChain } from './keybaseVerification.mjs'
 
 export const load = async (config, confirmEnterRoom) => {
   if (config.invite) return { invite: config.invite }
   if (config.domain) {
     const agreeableKey = await breakoutRoomKey(config.domain)
     const did = config.loadDid ? await didKey(config.domain) : null
-    const keybase = config.loadKeybase ? await keybaseKey(config.domain) : null
     if (agreeableKey) {
-      const invite = await withAgreeableKey(agreeableKey, confirmEnterRoom)
+      const { ok, invite, reason} = await withAgreeableKey(config, agreeableKey, confirmEnterRoom)
+      if (!ok) throw new Error(reason)
       return { invite, did }
     }
   }
@@ -18,20 +18,33 @@ export const load = async (config, confirmEnterRoom) => {
   if (config._ && config._.length === 1) return config._[0]
 }
 
-export const withAgreeableKey = async (agreeableKey, confirmEnterRoom) => {
-  const { newRoom, roomExpectations } = await roomProxyFromKey(agreeableKey)
-  const expectations = await roomExpectations()
-  if (confirmEnterRoom) {
-    const {agreement, whoami} = await confirmEnterRoom(expectations)
-    if (!agreement) return
+export const withAgreeableKey = async (config, agreeableKey, confirmEnterRoom) => {
+  const { roomExpectations, newRoom } = await roomProxyFromKey(agreeableKey)
+  const expectationOpts = {}
+  if (config.whoamiHost) expectationOpts.challengeText = await generateChallengeText()
+  /** @type{z.infer<Expectations>} */
+  const expectations = await roomExpectations(expectationOpts)
+  const confirmEnterRoomExtra = {}
+  if (config.whoamiHost && expectations.whoami && expectations.whoami.keybase) {
+    confirmEnterRoomExtra.whoami = { keybase: {} }
+    confirmEnterRoomExtra.whoami.keybase.verfied = await verifyWhoamiSignature(expectations.whoami.keybase.challengeResponse, expectations.whoami.keybase.username)
+    confirmEnterRoomExtra.whoami.keybase.chain = await getKeybaseProofChain(expectations.whoami.keybase.username)
   }
-  // Sign the whoami payload if private key is provided
-  const signedWhoami = config.privateKey ? 
-    await signWhoami(whoami, config.privateKey) : 
-    whoami
-  
-  const invite = await newRoom(agreement, signedWhoami)
-  return invite
+  if (!confirmEnterRoom) throw new Error('confirmEnterRoom function required')
+  const accept = await confirmEnterRoom(expectations, confirmEnterRoom)
+  const newRoomOpts = { accept }
+  if (expectations.whoamiRequired) {
+    newRoomOpts.whoami = {}
+    if (!config.keybaseUsername) throw new Error('keybaseUsername required in config')
+    if (!config.privateKeyArmored) throw new Error('pgp privateKeyArmored required in config')
+    if (!expectations.challengeText) throw new Error('challengeText required in expectations')
+    newRoomOpts.whoami.keybase = {
+      username: config.keybaseUsername,
+      challengeResponse: await signWhoami(expectations.challengeText, config.privateKeyArmored)
+  }
+  /** @type{z.infer<NewRoomResponse>} */
+  const response = await newRoom(newRoomOpts)
+  return response 
 }
 
 export const roomProxyFromKey = async (agreeableKey) => {
