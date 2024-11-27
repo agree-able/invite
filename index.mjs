@@ -4,7 +4,7 @@ import { breakoutRoomKey, didKey } from './dnsTxt.mjs'
 import { signWhoami, verifyWhoamiSignature, generateChallengeText, getKeybaseProofChain } from './keybaseVerification.mjs'
 import fs from 'fs'
 
-const ConfigSchema = z.object({
+export const ConfigSchema = z.object({
   invite: z.string().describe('Directly set invite - a z32 string').optional(),
   domain: z.string().describe('Domain to lookup breakout room key from').optional(),
   loadDid: z.boolean().describe('Whether to load DID from domain').optional(),
@@ -15,7 +15,7 @@ const ConfigSchema = z.object({
   _: z.array(z.string()).describe('Array of command line arguments').optional()
 })
 
-const ConfirmEnterRoomSchema = z.function().args(
+export const ConfirmEnterRoomSchema = z.function().args(
   Expectations,
   z.object({
     whoami: z.object({
