@@ -112,3 +112,52 @@ t.test('host does not sign the proper challenge text', async t => {
     t.end()
   }
 })
+
+t.test('participant requires whoami but host does not', async t => {
+  const config = { keybaseUsername: 'participant-keybase', privateKeyArmored: 'fake' }
+  // this is on the host side
+  const expectations = {
+    rules: 'no rules',
+    reason: 'no reason',
+    whoamiRequired: true,
+    challengeText: 'server-challenge'
+  }
+  const roomExpectations = async (input) => {
+    console.log('host roomExpectations input', input)
+    return expectations
+  }
+  // end host side
+
+  // this is on the participant side
+  const signText = async (text, privateKeyArmored) => {
+    t.equal(text, 'server-challenge', 'challenge text matches')
+    t.equal(privateKeyArmored, 'fake', 'private key matches')
+    return { text, armoredSignature: 'server-challenge-response-sig' }
+  }
+
+  const confirmEnterRoom = async (_expectations, hostDetails) => {
+    console.log('participant confirm enter room, expectations', _expectations)
+    console.log('participant confirm enter room, hostDetails', hostDetails)
+    return { rules: true, reason: true }
+  }
+  // end participant side
+
+  // lastly on the host side
+  const newRoom = async (input) => {
+    console.log('host new room', input)
+    t.ok(input.accept.rules, 'rules accepted')
+    t.ok(input.accept.reason, 'reason accepted')
+    t.ok(input.whoami)
+    t.equal(input.whoami.keybase.username, 'participant-keybase', 'keybase username matches')
+    t.equal(input.whoami.keybase.challengeResponse.text, 'server-challenge', 'challenge text matches')
+    t.equal(input.whoami.keybase.challengeResponse.armoredSignature, 'server-challenge-response-sig', 'challenge signature matches')
+    return { ok: true, invite: 'aaaa' }
+  }
+  // end host side
+
+  const result = await withExternal(config, confirmEnterRoom, { roomExpectations, newRoom }, { signText })
+  console.log(result)
+  t.equal(result.ok, true, 'invite created')
+  t.equal(result.invite, 'aaaa', 'invite matches')
+  t.end()
+})

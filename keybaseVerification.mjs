@@ -57,7 +57,6 @@ export const verifySignedText = async ({ text, armoredSignature }, keybaseUserna
     const response = await fetch(`https://keybase.io/${keybaseUsername}/pgp_keys.asc`)
     const publicKeyArmored = await response.text()
     const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored })
-    // console.log('got public key', publicKey)
 
     // Verify signature
     const message = await openpgp.createMessage({ text })
@@ -71,7 +70,8 @@ export const verifySignedText = async ({ text, armoredSignature }, keybaseUserna
       verificationKeys: publicKey
     })
 
-    const { verified } = await verificationResult.signatures[0]
+    const { verified } = verificationResult.signatures[0]
+    await verified
     return verified
   } catch (error) {
     return false
