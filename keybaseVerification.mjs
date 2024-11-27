@@ -14,8 +14,6 @@ export const getKeybaseProofChain = async (keybaseUsername) => {
     console.log(url)
     const response = await fetch(url)
     const data = await response.json()
-    console.log('daaata', JSON.stringify(data, null, 4))
-
     if (!data.them || !data.them.proofs_summary) {
       throw new Error('User not found or no proofs available')
     }

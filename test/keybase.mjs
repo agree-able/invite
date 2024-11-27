@@ -18,7 +18,6 @@ t.test('test sign and verify', async t => {
   const verified = await verifySignedText(result, 'agreeable-test')
 
   t.ok(verified)
-  nock.restore()
   t.end()
 })
 
@@ -29,7 +28,6 @@ t.test('text is mutated', async t => {
   result.text += 'fdsfdsa'
   const verified = await verifySignedText(result, 'agreeable-test')
   t.notOk(verified)
-  nock.restore()
   t.end()
 })
 
@@ -41,19 +39,15 @@ t.test('signature is mutated', async t => {
   result.armoredSignature = 'fdsfdsa'
   const verified = await verifySignedText(result, 'agreeable-test')
   t.notOk(verified)
-  nock.restore()
   t.end()
 })
 
 t.test('keybase proof chain', async t => {
-  nock('https://keybase.io', {
-    encodedQueryParams: true
-  })
+  nock('https://keybase.io')
     .get('/_/api/1.0/user/lookup.json')
-    .query(true)  // This will match the exact query string
+    .query(true) // This will match the exact query string
     .reply(200, JSON.parse(keybaseProofChain))
   const results = await getKeybaseProofChain('agreeable-test')
-  console.log(results)
-  nock.restore()
+  t.ok(results)
   t.end()
 })
