@@ -48,7 +48,7 @@ t.test('signature is mutated', async t => {
 t.test('keybase proof chain', async t => {
   nock('https://keybase.io')
     .get('/_/api/1.0/user/lookup.json')
-    .query({ username: 'agreeable-test' })
+    .query({ username: 'agreeable-test', fields: 'proofs_summary' })
     .reply(200, JSON.parse(keybaseProofChain))
   const results = await getKeybaseProofChain('agreeable-test')
   console.log(results)
