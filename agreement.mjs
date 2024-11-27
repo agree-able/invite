@@ -3,8 +3,8 @@ import { z, addRoute } from '@agree-able/contract'
 export const KeybaseProof = z.object({
   username: z.string().describe('keybase username'),
   challengeResponse: z.object({
-    payload: z.string().describe('the challenge text'),
-    signature: z.string().describe('the signature of the challenge text')
+    text: z.string().describe('the challenge text'),
+    armoredSignature: z.string().describe('the ascii armored signature of the challenge text')
   })
 })
 

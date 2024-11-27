@@ -1,7 +1,7 @@
 import { z, Caller } from '@agree-able/rpc'
 import agreement, { Expectations, AcceptExpectations } from './agreement.mjs'
 import { breakoutRoomKey, didKey } from './dnsTxt.mjs'
-import { signWhoami, verifyWhoamiSignature, generateChallengeText, getKeybaseProofChain } from './keybaseVerification.mjs'
+import { signText, verifySignedText, generateChallengeText, getKeybaseProofChain } from './keybaseVerification.mjs'
 import fs from 'fs'
 
 export const ConfigSchema = z.object({
@@ -69,7 +69,7 @@ export const load = async (config, confirmEnterRoom) => {
 
 export const withAgreeableKey = async (config, confirmEnterRoom, agreeableKey) => {
   const proxy = await roomProxyFromKey(agreeableKey)
-  const keybase = { verifyWhoamiSignature, getKeybaseProofChain }
+  const keybase = { verifySignedText, signText, getKeybaseProofChain }
   return await withExternal(config, confirmEnterRoom, proxy, keybase)
 }
 
@@ -81,8 +81,9 @@ export const withExternal = async (config, confirmEnterRoom, { roomExpectations,
   if (config.hostProveWhoami && !expectations.whoami) throw new Error('host was to prove whoami but expectations.whoami was not returned')
   const hostDetails = {}
   if (config.hostProveWhoami && expectations.whoami && expectations.whoami.keybase) {
+    if (expectationOpts.challengeText !== expectations.whoami.keybase.challengeResponse.text) throw new Error('challengeText was modified')
     hostDetails.whoami = { keybase: { username: expectations.whoami.keybase.username } }
-    hostDetails.whoami.keybase.verfied = await keybase.verifyWhoamiSignature(expectations.whoami.keybase.challengeResponse, expectations.whoami.keybase.username)
+    hostDetails.whoami.keybase.verfied = await keybase.verifySignedText(expectations.whoami.keybase.challengeResponse, expectations.whoami.keybase.username)
     hostDetails.whoami.keybase.chain = await keybase.getKeybaseProofChain(expectations.whoami.keybase.username)
   }
   if (!confirmEnterRoom) throw new Error('confirmEnterRoom function required')
@@ -99,7 +100,7 @@ export const withExternal = async (config, confirmEnterRoom, { roomExpectations,
     }
     newRoomOpts.whoami.keybase = {
       username: config.keybaseUsername,
-      challengeResponse: await signWhoami(expectations.challengeText, privateKeyArmored)
+      challengeResponse: await keybase.signText(expectations.challengeText, privateKeyArmored)
     }
   }
   /** @type{z.infer<NewRoomResponse>} */

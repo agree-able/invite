@@ -28,14 +28,14 @@ t.test('participant requires whoami but host does not', async t => {
     reason: 'no reason',
     whoamiRequired: false
   }
-  const roomExpectations = (input) => {
+  const roomExpectations = async (input) => {
     console.log('host roomExpectations input', input)
     expectations.whoami = {
       keybase: {
         username: 'host_username',
         challengeResponse: {
           text: input.challengeText,
-          signature: 'server-challenge-response'
+          armoredSignature: 'server-challenge-response'
         }
       }
     }
@@ -44,9 +44,9 @@ t.test('participant requires whoami but host does not', async t => {
   // end host side
 
   // this is on the participant side
-  const verifyWhoamiSignature = async (signedWhoami, username) => {
+  const verifySignedText = async ({ text, armoredSignature }, username) => {
     t.equal(username, 'host_username', 'host username matches')
-    console.log('participant verifyWhoamiSignature', signedWhoami)
+    console.log('participant verifyWhoamiSignature', text, armoredSignature)
     // t.equal(signedWhoami.text, 'server-challenge-response', 'challenge response matches')
     return true
   }
@@ -70,28 +70,22 @@ t.test('participant requires whoami but host does not', async t => {
   }
   // end host side
 
-  const result = await withExternal(config, confirmEnterRoom, { roomExpectations, newRoom }, { verifyWhoamiSignature, getKeybaseProofChain })
+  const result = await withExternal(config, confirmEnterRoom, { roomExpectations, newRoom }, { verifySignedText, getKeybaseProofChain })
   console.log(result)
   t.end()
 })
 
-t.test('host does not sign the challenge text, but another text', async t => {
+t.test('host does not sign the proper challenge text', async t => {
   const config = { hostProveWhoami: true }
-
   // this is on the host side
-  const expectations = {
-    rules: 'no rules',
-    reason: 'no reason',
-    whoamiRequired: false
-  }
-  const roomExpectations = (input) => {
-    console.log('host roomExpectations input', input)
+  const expectations = { rules: 'no rules', reason: 'no reason', whoamiRequired: false }
+  const roomExpectations = async (input) => {
     expectations.whoami = {
       keybase: {
         username: 'host_username',
         challengeResponse: {
           text: input.challengeText + 'bad',
-          signature: 'server-challenge-response'
+          armoredSignature: 'server-challenge-response-bad'
         }
       }
     }
@@ -100,33 +94,21 @@ t.test('host does not sign the challenge text, but another text', async t => {
   // end host side
 
   // this is on the participant side
-  const verifyWhoamiSignature = async (signedWhoami, username) => {
-    t.equal(username, 'host_username', 'host username matches')
-    console.log('participant verifyWhoamiSignature', signedWhoami)
-    // t.equal(signedWhoami.text, 'server-challenge-response', 'challenge response matches')
-    return true
-  }
-  const getKeybaseProofChain = async (username) => {
-    t.equal(username, 'host_username', 'host username matches')
-    console.log('participant keybase proof chain', username)
-    return 'chain'
-  }
-  const confirmEnterRoom = async (_expectations, hostDetails) => {
-    console.log('participant confirm enter room, expectations', _expectations)
-    console.log('participant confirm enter room, hostDetails', hostDetails)
-    t.ok(hostDetails.whoami.keybase.verfied, 'keybase returned verified, available for confirm enter room')
-    return { rules: true, reason: true }
-  }
+  const verifySignedText = async () => t.fail('should not be called')
+  const getKeybaseProofChain = async (_username) => t.fail('should not be called')
+  const confirmEnterRoom = async (_expectations, _hostDetails) => t.fail('should not be called')
   // end participant side
 
   // lastly on the host side
-  const newRoom = async (input) => {
-    console.log('host new room', input)
-    return { ok: true, invite: 'aaaa' }
-  }
+  const newRoom = async (_input) => t.fail('should not be called')
   // end host side
 
-  const result = await withExternal(config, confirmEnterRoom, { roomExpectations, newRoom }, { verifyWhoamiSignature, getKeybaseProofChain })
-  console.log(result)
-  t.end()
+  try {
+    await withExternal(config, confirmEnterRoom, { roomExpectations, newRoom }, { verifySignedText, getKeybaseProofChain })
+    t.fail('should not be reached')
+  } catch (error) {
+    t.equal(error.message, 'challengeText was modified', 'error message matches')
+    t.ok(error, 'error thrown')
+    t.end()
+  }
 })

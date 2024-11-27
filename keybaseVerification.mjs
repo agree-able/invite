@@ -37,21 +37,21 @@ export const getKeybaseProofChain = async (keybaseUsername) => {
   }
 }
 
-export const signWhoami = async (whoami, privateKeyArmored) => {
+export const signText = async (text, privateKeyArmored) => {
   const privateKey = await openpgp.readPrivateKey({ armoredKey: privateKeyArmored })
-  const message = await openpgp.createMessage({ text: JSON.stringify(whoami) })
-  const signature = await openpgp.sign({
+  const message = await openpgp.createMessage({ text })
+  const armoredSignature = await openpgp.sign({
     message,
     signingKeys: privateKey,
     detached: true
   })
   return {
-    payload: whoami,
-    signature
+    text,
+    armoredSignature
   }
 }
 
-export const verifyWhoamiSignature = async (signedWhoami, keybaseUsername) => {
+export const verifySignedText = async ({ text, armoredSignature }, keybaseUsername) => {
   try {
     // Fetch public key from keybase
     const response = await fetch(`https://keybase.io/${keybaseUsername}/pgp_keys.asc`)
@@ -60,9 +60,9 @@ export const verifyWhoamiSignature = async (signedWhoami, keybaseUsername) => {
     // console.log('got public key', publicKey)
 
     // Verify signature
-    const message = await openpgp.createMessage({ text: JSON.stringify(signedWhoami.payload) })
+    const message = await openpgp.createMessage({ text })
     const signature = await openpgp.readSignature({
-      armoredSignature: signedWhoami.signature
+      armoredSignature
     })
 
     const verificationResult = await openpgp.verify({
