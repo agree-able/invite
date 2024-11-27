@@ -58,7 +58,7 @@ t.test('participant requires whoami but host does not', async t => {
   const confirmEnterRoom = async (_expectations, hostDetails) => {
     console.log('participant confirm enter room, expectations', _expectations)
     console.log('participant confirm enter room, hostDetails', hostDetails)
-    t.ok(hostDetails.whoami.keybase.verfied, 'keybase returned verified, available for confirm enter room')
+    t.ok(hostDetails.whoami.keybase.verified, 'keybase returned verified, available for confirm enter room')
     return { rules: true, reason: true }
   }
   // end participant side

@@ -83,7 +83,7 @@ export const withExternal = async (config, confirmEnterRoom, { roomExpectations,
   if (config.hostProveWhoami && expectations.whoami && expectations.whoami.keybase) {
     if (expectationOpts.challengeText !== expectations.whoami.keybase.challengeResponse.text) throw new Error('challengeText was modified')
     hostDetails.whoami = { keybase: { username: expectations.whoami.keybase.username } }
-    hostDetails.whoami.keybase.verfied = await keybase.verifySignedText(expectations.whoami.keybase.challengeResponse, expectations.whoami.keybase.username)
+    hostDetails.whoami.keybase.verified = await keybase.verifySignedText(expectations.whoami.keybase.challengeResponse, expectations.whoami.keybase.username)
     hostDetails.whoami.keybase.chain = await keybase.getKeybaseProofChain(expectations.whoami.keybase.username)
   }
   if (!confirmEnterRoom) throw new Error('confirmEnterRoom function required')
