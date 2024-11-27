@@ -76,7 +76,7 @@ The `load` function accepts a configuration object with the following options:
 - `invite`: Direct invite code (z32 string)
 - `domain`: Domain to lookup breakout room key from
 - `loadDid`: Whether to load DID from domain
-- `whoamiHost`: Enable host whoami verification
+- `hostProveWhoami`: Enable host whoami verification
 - `keybaseUsername`: Keybase username for verification
 - `privateKeyArmoredFile`: File location of PGP private key
 - `privateKeyArmored`: PGP private key in armored format
