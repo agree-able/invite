@@ -1,10 +1,4 @@
 {
-  "dependencies": {
-    "@agree-able/contract": "^2.0.0",
-    "@agree-able/rpc": "^3.0.0",
-    "node-fetch": "^3.3.2",
-    "openpgp": "^6.0.1"
-  },
   "name": "@agree-able/invite",
   "version": "1.0.0",
   "description": "simple ways to get an invite to a room",
@@ -23,6 +17,12 @@
     "url": "https://github.com/agree-able/invite/issues"
   },
   "homepage": "https://github.com/agree-able/invite#readme",
+  "dependencies": {
+    "@agree-able/contract": "^2.0.0",
+    "@agree-able/rpc": "^3.0.0",
+    "node-fetch": "^3.3.2",
+    "openpgp": "^6.0.1"
+  },
   "devDependencies": {
     "nock": "^13.5.6",
     "standard": "^17.1.2",
