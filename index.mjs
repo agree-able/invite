@@ -9,6 +9,7 @@ export { signText, verifySignedText, generateChallengeText, getKeybaseProofChain
 
 export const ConfigSchema = z.object({
   invite: z.string().describe('Directly set invite - a z32 string').optional(),
+  agreeableKey: z.string().describe('Key to lookup breakout room key from').optional(),
   domain: z.string().describe('Domain to lookup breakout room key from').optional(),
   loadDid: z.boolean().describe('Whether to load DID from domain').optional(),
   hostProveWhoami: z.boolean().describe('Should the Host prove whoami verification').optional(),
@@ -48,6 +49,7 @@ export const ConfirmEnterRoomSchema = z.function().args(
  * Loads room configuration based on provided config options
  * @param {Object} config - Configuration object
  * @param {string} [config.invite] - invite is directly set, no lookup - a z32 string
+* @param {string} [config.agreeableKey] - Key to lookup breakout room key from
  * @param {string} [config.domain] - Domain to lookup breakout room key from
  * @param {boolean} [config.loadDid] - Whether to load DID from domain
  * @param {boolean} [config.hostProveWhoami] - should the Host perform whoami verification
@@ -64,6 +66,7 @@ export const handleInvite = async (config, confirmEnterRoom) => {
   // validate confirmEnterRoom using zod
   ConfirmEnterRoomSchema.parse(confirmEnterRoom)
   if (config.invite) return { invite: config.invite }
+  if (config.agreeableKey) return await withAgreeableKey(config, confirmEnterRoom, config.agreeableKey, {})
   if (config.domain) {
     const agreeableKey = await breakoutRoomKey(config.domain)
     const extraInfo = {}
