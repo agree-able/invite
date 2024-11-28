@@ -1,6 +1,6 @@
 {
   "name": "@agree-able/invite",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "simple ways to get an invite to a room",
   "main": "index.mjs",
   "scripts": {
