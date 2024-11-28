@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "@agree-able/contract": "^1.4.1",
-    "@agree-able/rpc": "^2.0.3",
+    "@agree-able/contract": "^2.0.0",
+    "@agree-able/rpc": "^3.0.0",
     "node-fetch": "^3.3.2",
     "openpgp": "^6.0.1"
   },

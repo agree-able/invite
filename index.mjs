@@ -5,6 +5,7 @@ import { signText, verifySignedText, generateChallengeText, getKeybaseProofChain
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
+export { signText, verifySignedText, generateChallengeText, getKeybaseProofChain }
 
 export const ConfigSchema = z.object({
   invite: z.string().describe('Directly set invite - a z32 string').optional(),
@@ -17,19 +18,23 @@ export const ConfigSchema = z.object({
   _: z.array(z.string()).describe('Array of command line arguments').optional()
 })
 
+const ChainItem = z.object({
+  username: z.string().describe('username associated with the proof'),
+  serviceUrl: z.string().describe('URL of the service where the proof is hosted'),
+  proofUrl: z.string().describe('Direct URL to the proof'),
+  presentedUrl: z.string().optional().describe('User-friendly URL for displaying the proof').optional(),
+  state: z.number().describe('Whether the proof is currently valid')
+})
+
 export const HostDetails = z.object({
   did: z.string().optional().describe('DID of the host'),
   whoami: z.object({
     keybase: z.object({
       username: z.string().describe('username on keybase'),
       verified: z.boolean().describe('if the verification passed'),
-      chain: z.array(z.object({
-        username: z.string().describe('username associated with the proof'),
-        serviceUrl: z.string().describe('URL of the service where the proof is hosted'),
-        proofUrl: z.string().describe('Direct URL to the proof'),
-        presentedUrl: z.string().optional().describe('User-friendly URL for displaying the proof').optional(),
-        state: z.number().describe('Whether the proof is currently valid')
-      })).describe('keybase information about the host')
+      chain: z.object({
+        dns: z.array(ChainItem)
+      }).passthrough()
     }).optional().describe('if hostProveWhoami is true, then this should be provided')
   }).optional().describe('host whoami')
 })
@@ -53,7 +58,7 @@ export const ConfirmEnterRoomSchema = z.function().args(
  * @param {Function} confirmEnterRoom - Callback function to confirm room entry
  * @returns {Promise<{invite?: string }>} Room configuration
  */
-export const load = async (config, confirmEnterRoom) => {
+export const handleInvite = async (config, confirmEnterRoom) => {
   // validate config using zod
   ConfigSchema.parse(config)
   // validate confirmEnterRoom using zod
@@ -99,6 +104,7 @@ export const withExternal = async (config, confirmEnterRoom, { roomExpectations,
     if (!hostDetails.whoami) throw new Error('host did not provide any known whoami response')
   }
   const wrapped = ConfirmEnterRoomSchema.implement(confirmEnterRoom)
+  console.log('calling the confirmEnterRoom function', JSON.stringify(expectations, null, 4), JSON.stringify(hostDetails, null, 4))
   const accept = await wrapped(expectations, hostDetails)
   AcceptExpectations.parse(accept)
 

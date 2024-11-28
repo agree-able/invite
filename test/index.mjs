@@ -1,10 +1,10 @@
 import t from 'tap'
-import { load, withExternal } from '../index.mjs'
+import { handleInvite, withExternal } from '../index.mjs'
 
 t.test('load where invite is on the config object', async t => {
   const config = { invite: 'aaaa' }
   const confirmEnterRoom = (_expectations, _extraInfo) => {}
-  const { invite } = await load(config, confirmEnterRoom)
+  const { invite } = await handleInvite(config, confirmEnterRoom)
   t.ok(invite, 'invite')
   t.equal(invite, 'aaaa')
   t.end()
@@ -13,7 +13,7 @@ t.test('load where invite is on the config object', async t => {
 t.test('load where invite is on the first arg', async t => {
   const config = { _: ['aaaa'] }
   const confirmEnterRoom = (_expectations, _extraInfo) => {}
-  const { invite } = await load(config, confirmEnterRoom)
+  const { invite } = await handleInvite(config, confirmEnterRoom)
   t.ok(invite, 'invite')
   t.equal(invite, 'aaaa')
   t.end()
@@ -53,14 +53,14 @@ t.test('participant requires whoami but host does not', async t => {
   const getKeybaseProofChain = async (username) => {
     t.equal(username, 'host_username', 'host username matches')
     console.log('participant keybase proof chain', username)
-    const dns = {
+    const dns = [{
       username: 'ramage.in',
       serviceUrl: 'http://ramage.in',
       proofUrl: 'https://keybase.io/ra_mage/sigchain#a8f1b8e499aed3e0807898a3225e797a4464b38ad8a50ec3b686a480ff9cabb00f',
       presentedUrl: undefined,
       state: 1
-    }
-    return [dns]
+    }]
+    return { dns }
   }
   const confirmEnterRoom = async (_expectations, hostDetails) => {
     console.log('participant confirm enter room, expectations', _expectations)
