@@ -3,6 +3,8 @@ import agreement, { Expectations, AcceptExpectations } from './agreement.mjs'
 import { breakoutRoomKey, didKey } from './dnsTxt.mjs'
 import { signText, verifySignedText, generateChallengeText, getKeybaseProofChain } from './keybaseVerification.mjs'
 import fs from 'fs'
+import path from 'path'
+import os from 'os'
 
 export const ConfigSchema = z.object({
   invite: z.string().describe('Directly set invite - a z32 string').optional(),
@@ -59,15 +61,18 @@ export const load = async (config, confirmEnterRoom) => {
   if (config.invite) return { invite: config.invite }
   if (config.domain) {
     const agreeableKey = await breakoutRoomKey(config.domain)
+    const extraInfo = {}
     const did = config.loadDid ? await didKey(config.domain) : null
+    if (did) extraInfo.did = did
     if (agreeableKey) {
-      const { ok, invite, reason } = await withAgreeableKey(config, confirmEnterRoom, agreeableKey, { did })
+      const { ok, invite, reason } = await withAgreeableKey(config, confirmEnterRoom, agreeableKey, extraInfo)
       if (!ok) throw new Error(reason)
       return { invite }
     }
   }
   // lastly if one string on the cli, lets assume that is the invite
   if (config._ && config._.length === 1) return { invite: config._[0] }
+  return {}
 }
 
 export const withAgreeableKey = async (config, confirmEnterRoom, agreeableKey, hostExtraInfo) => {
@@ -103,9 +108,9 @@ export const withExternal = async (config, confirmEnterRoom, { roomExpectations,
     if (!config.keybaseUsername) throw new Error('keybaseUsername required in config')
     if (!config.privateKeyArmored && !config.privateKeyArmoredFile) throw new Error('pgp privateKeyArmored required in config')
     if (!expectations.challengeText) throw new Error('challengeText required in expectations')
-    const privateKeyArmored = config.privateKeyArmored
+    let privateKeyArmored = config.privateKeyArmored
     if (config.privateKeyArmoredFile) {
-      config.privateKeyArmored = await fs.promises.readFile(config.privateKeyArmoredFile, 'utf8')
+      privateKeyArmored = fs.readFileSync(resolvePath(config.privateKeyArmoredFile), 'utf8')
     }
     newRoomOpts.whoami.keybase = {
       username: config.keybaseUsername,
@@ -126,4 +131,12 @@ export const roomProxyFromKey = async (agreeableKey) => {
    * }} */
   const { newRoom, roomExpectations } = caller.proxy(agreement)
   return { newRoom, roomExpectations }
+}
+
+// Function to resolve a path with ~
+function resolvePath(inputPath) {
+    if (inputPath.startsWith('~')) {
+        return path.join(os.homedir(), inputPath.slice(1));
+    }
+    return path.resolve(inputPath);
 }
