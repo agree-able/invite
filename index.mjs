@@ -134,9 +134,9 @@ export const roomProxyFromKey = async (agreeableKey) => {
 }
 
 // Function to resolve a path with ~
-function resolvePath(inputPath) {
-    if (inputPath.startsWith('~')) {
-        return path.join(os.homedir(), inputPath.slice(1));
-    }
-    return path.resolve(inputPath);
+function resolvePath (inputPath) {
+  if (inputPath.startsWith('~')) {
+    return path.join(os.homedir(), inputPath.slice(1))
+  }
+  return path.resolve(inputPath)
 }
