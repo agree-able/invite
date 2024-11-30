@@ -107,7 +107,7 @@ export const withExternal = async (config, confirmEnterRoom, { roomExpectations,
     if (!hostDetails.whoami) throw new Error('host did not provide any known whoami response')
   }
   const wrapped = ConfirmEnterRoomSchema.implement(confirmEnterRoom)
-  console.log('calling the confirmEnterRoom function', JSON.stringify(expectations, null, 4), JSON.stringify(hostDetails, null, 4))
+  // console.log('calling the confirmEnterRoom function', JSON.stringify(expectations, null, 4), JSON.stringify(hostDetails, null, 4))
   const accept = await wrapped(expectations, hostDetails)
   AcceptExpectations.parse(accept)
 
