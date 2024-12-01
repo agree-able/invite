@@ -11,7 +11,6 @@ export const generateChallengeText = async () => {
 export const getKeybaseProofChain = async (keybaseUsername) => {
   try {
     const url = `https://keybase.io/_/api/1.0/user/lookup.json?username=${keybaseUsername}&fields=proofs_summary`
-    console.log(url)
     const response = await fetch(url)
     const data = await response.json()
     if (!data.them || !data.them.proofs_summary) {
