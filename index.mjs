@@ -16,6 +16,7 @@ export const ConfigSchema = z.object({
   keybaseUsername: z.string().describe('Keybase username for verification').optional(),
   privateKeyArmoredFile: z.string().describe('File location of a PGP private key in armored format').optional(),
   privateKeyArmored: z.string().describe('PGP private key in armored format').optional(),
+  signMessages: z.boolean().describe('Sign each message with PGP key').optional(),
   _: z.array(z.string()).describe('Array of command line arguments').optional()
 })
 
@@ -56,6 +57,7 @@ export const ConfirmEnterRoomSchema = z.function().args(
  * @param {string} [config.keybaseUsername] - Keybase username for verification
  * @param {string} [config.privateKeyArmoredFile] - File location of a PGP private key in armored format
  * @param {string} [config.privateKeyArmored] - PGP private key in armored format
+ * @param {boolean} [config.signMessages] - Sign each message with PGP key
  * @param {string[]} [config._] - Array of command line arguments
  * @param {Function} confirmEnterRoom - Callback function to confirm room entry
  * @returns {Promise<{invite?: string }>} Room configuration
